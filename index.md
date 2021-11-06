@@ -1,6 +1,16 @@
-# Live Mesh: Programming against the Live Framework
+---
+title: "Live Mesh: Programming against the Live Framework"
+date: "2009-04-19"
+categories: 
+  - "c"
+  - "live-framework"
+  - "programming"
+tags: 
+  - "live-services"
+  - "mesh"
+---
 
-## Introduction
+**Introduction**![Live Mesh](images/livemesh.png "Live Mesh")
 
 In March I went to the Microsoft TechDays in Belgium. The last session I attended was about Microsoft's [Live Services](http://dev.live.com/) and the Live Framework used for programming against these services. To showcase all this the [Live Mesh](http://www.mesh.com) service was used.
 
@@ -14,7 +24,21 @@ When you place a new file into a Live Mesh folder, the client will upload this f
 
 There is more to it than this, but this is the gist of it. The goal of this article is to demonstrate just how easy it is to use the Live Framework to program against the Live Mesh service. With a small amount of code you'll be able to create folders and store files in your Mesh account.
 
-## Getting Started
+**Table Of Contents**
+
+- [Introduction](#introduction)
+- [Getting Started](#gettingstarted)
+- [Live Framework Resource Model](#resourcemodel)
+- [Connecting To The Live Services](#liveframework)
+- [Listing Mesh Objects](#meshobjects)
+- [Mesh Object Resources](#resources)
+- [Creating A Directory](#createdirectory)
+- [Adding A File](#addfile)
+- [Retrieving A File](#retrievefile)
+- [Summary](#summary)
+- [Download](#download)
+
+**Getting Started**
 
 To get started you need to obtain the Live Framework Client. A separate sandbox environment has been setup for developers who wish to test and evaluate the Live Framework and the Live Services.
 
@@ -38,9 +62,7 @@ The required software (SDK & Tools) and documentation for programming against th
 
 You can recognize the Developer Live Mesh client by this icon in the system tray.
 
-**Figure 1** - Live Mesh Developer Client System Tray Icon
-
-![Mesh Developer Systemtray Icon](images/mesh-systray-icon.jpg "Mesh Developer Systemtray Icon")
+**Figure 1** - Live Mesh Developer Client System Tray Icon ![Mesh Developer Systemtray Icon](images/mesh-systray-icon.jpg "Mesh Developer Systemtray Icon")
 
 After all accounts have been created and the SDK has been setup you're finally ready to go...
 
@@ -48,13 +70,15 @@ After all accounts have been created and the SDK has been setup you're finally r
 
 [Mike Tautly](http://mtaulty.com/communityserver/blogs/mike_taultys_blog/default.aspx) has put up a nice screencast on how to get started with Live Mesh, [check it out here](http://channel9.msdn.com/posts/mtaulty/Live-Framework-SDK-Getting-Started/).
 
-## Live Framework Resource Model
+[Top of page](#top)
+
+**Live Framework Resource Model**
 
 Before proceeding further a bit of information on the storage hierarchy of Mesh is advisable. The Live Framework encapsulates more than just Mesh as you can see in the following image.
 
 **Figure 2** - Live Framework Resource Model
 
-![Live Framework Resource odel](images/resource-model.jpg "Live Framework Resource Model")
+[![Live Framework Resource odel](http://cgeers.files.wordpress.com/2009/04/resource-model.jpg?w=300 "Live Framework Resource odel")](http://cgeers.files.wordpress.com/2009/04/resource-model.jpg)
 
 Let's focus solely on Mesh. Using a bottom-up approach the first item of interest is the data entry object. A data entry is the actual data stored in your Mesh, it can be a picture, a pdf, zip archive...etc. You are not confined to only storing files. You can, for example, also store objects as data entries.
 
@@ -66,7 +90,9 @@ Just like with the data entries you determine how many data feeds a MeshObject c
 
 To recap, for synchronizing folders and files, Mesh adds a single MeshObject for each Live Mesh folder. Each MeshObject has one data feed which contains a collection of data entries. The data entries are the actual files stored in the folder.
 
-## Connecting To The Live Services
+[Top of page](#top)
+
+**Connecting To The Live Services**
 
 The source code accompagnying this article aims at demonstrating how to establish a connection with the Live Services, querying and creating resources (directories) and uploading / downloading a file.
 
@@ -81,7 +107,6 @@ Well, for starters let's begin with the initial task of establishing a connectio
 
 **Listing 1** - LiveOperatingEnvironment class (LOE)
 
-```csharp
 public class LiveMesh
 {
   #region Fields
@@ -130,7 +155,6 @@ public class LiveMesh
 
   #endregion
 }
-```
 
 This class has a constructor which takes two strings, namely the username and password of your Windows Live Id. The variable serverUri contains the address of the Live Framework server to which you need to connect.
 
@@ -140,9 +164,8 @@ The LiveMesh class's Connect method in turn calls the LOE class' Connect method 
 
 Let's quickly test the LiveMesh class. The code in Listing 2 doesn't need any further explanation.
 
-**Listing 2** - Connecting to your Mesh
+**Listing 2**\- Connecting to your Mesh
 
-```csharp
 using System;
 
 namespace ConsoleApplication
@@ -152,7 +175,7 @@ namespace ConsoleApplication
         private const string userName = "xxxxx@xxxxx.com";
         private const string password = "xxxxx";
 
-        static void Main(string[] args)
+        static void Main(string\[\] args)
         {
             LiveMesh myMesh = new LiveMesh(userName, password);
 
@@ -170,21 +193,21 @@ namespace ConsoleApplication
         }
     }
 }
-```
 
 **Note**: Don't forget to replace the userName and password values with your own.
 
-## Listing Mesh Objects
+[Top of page](#top)
+
+**Listing Mesh Objects**
 
 To list the objects present in your Mesh a simple Linq query suffices. Add the following method to your LiveMesh class.
 
 **Listing 3** - GetMeshObjects() method
 
-```csharp
 public class LiveMesh
 {
     // ...
-
+    
     #region Methods
 
     public IEnumerable<MeshObject> GetMeshObjects()
@@ -194,29 +217,26 @@ public class LiveMesh
     }
 
     #endregion
-
+    
     // ...
 }
-```
 
 As you can see the Linq query follows the pattern shown in figure 2, the Live Framework Resource Model. The Mesh property of the LiveOperatingEnvironment instance is queried and all the Mesh objects are returned (Service Endpoint -> Mesh -> Mesh Objects). Now let's foreach this collection and take a look at the results.
 
 **Listing 4** - Foreaching the Mesh objects
 
-```csharp
 // List the MeshObjects in your Mesh
 IEnumerable<MeshObject> meshObjects = myMesh.GetMeshObjects();
 foreach(var meshObject in meshObjects)
 {
     Console.WriteLine(meshObject.Resource.Title);
 }
-```
 
 The output:
 
 **Figure 3** - My Mesh Objects
 
-![My Mesh Objects](images/my-mesh-objects.jpg "My Mesh Objects")
+[![My Mesh Objects](images/my-mesh-objects.jpg "My Mesh Objects")](http://cgeers.files.wordpress.com/2009/04/my-mesh-objects.jpg)
 
 The folders "Pictures" and "Blog" were two folders I created using the Live Mesh Developer version website (Live Desktop). Feel free to create your own folders using the site and check if they show up in the query results.
 
@@ -224,15 +244,15 @@ There are two ways to query Mesh. You could also rewrite the query shown in List
 
 **Listing 5** - CreateQuery<T> Versus Entries
 
-```csharp
 return from o in environment.Mesh.MeshObjects.Entries select o;
-```
 
 What's the difference? CreateQuery<T> executes server side while using the Entries collection will be executed client-side. The latter case will result in more objects being sent over the wire. For a more in-depth explanation check out this [excellent blog post](http://blogs.msdn.com/benwilli/archive/2009/03/09/linqing-to-the-live-framework.aspx).
 
 **Note**: If you only want to return Mesh objects which are folders, then add this where clause: where o.Resource.Type == "LiveMeshFolder".
 
-## Mesh Object Resources
+[Top of page](#top)
+
+**Mesh Object Resources**
 
 Now that you know how to obtain your Mesh objects, let's retrieve the resources (data entries) of such a Mesh object. In order words let's list the files of a Live Mesh folder.
 
@@ -240,14 +260,13 @@ Add the method shown in Listing 6 to your LiveMesh class.
 
 **Listing 6** - GetFilesOfFolder() method
 
-```csharp
 public IEnumerable<DataEntry> GetFilesOfFolder(MeshObject meshObject)
 {
-    // Obtain the data feed.
+    // Obtain the data feed. 
     // A Mesh Object representing a folder only has one data feed.
     // It's title is LiveMeshFiles.
     DataFeed feed = (from f in meshObject.CreateQuery<DataFeed>().Execute()
-                     where f.Resource.Title == "LiveMeshFiles"
+                     where f.Resource.Title == "LiveMeshFiles" 
                      select f).First();
     if (feed == null)
     {
@@ -255,13 +274,11 @@ public IEnumerable<DataEntry> GetFilesOfFolder(MeshObject meshObject)
     }
     return from e in feed.CreateQuery<DataEntry>().Execute() select e;
 }
-```
 
 Let's update the foreach loop in the Main method.
 
 **Listing 7** - Updated Main method
 
-```csharp
 // ...
 
 // List the MeshObjects in your Mesh
@@ -274,21 +291,22 @@ foreach(var meshObject in meshObjects)
     IEnumerable<DataEntry> files = myMesh.GetFilesOfFolder(meshObject);
     foreach(var file in files)
     {
-        Console.WriteLine(String.Format("\t{0}", file.Resource.Title));
+        Console.WriteLine(String.Format("\\t{0}", file.Resource.Title));
     }
     Console.WriteLine();
 }
 
 // ...
-```
 
 **Figure 4** - Mesh Object Resources (files)
 
-![Mesh Object Resources](images/mesh-object-resources1.jpg "Mesh Object Resources")
+[![Mesh Object Resources](images/mesh-object-resources1.jpg "Mesh Object Resources")](http://cgeers.files.wordpress.com/2009/04/mesh-object-resources1.jpg)
 
 Just place some files in your Mesh folders using the Live Desktop to test this code.
 
-## Creating A Directory
+[Top of page](#top)
+
+**Creating A Directory**
 
 Great, you can now query your Mesh objects and their resources. But how about actually creating a folder without resorting to the Live Desktop?
 
@@ -296,7 +314,6 @@ Again, a short and simple amount of code is all you need. Add the following two 
 
 **Listing 8** - DirectoryExists() and CreateDirectory() methods
 
-```csharp
 public bool DirectoryExists(string directory)
 {
     var q = (from o in environment.Mesh.CreateQuery<MeshObject>().Execute()
@@ -320,20 +337,21 @@ public void CreateDirectory(string directory)
     environment.Mesh.MeshObjects.Add(ref newDirectory);
 
     // Create a data feed, set its type and handler
-    DataFeed feed =
-        new DataFeed("LiveMeshFiles")
+    DataFeed feed = 
+        new DataFeed("LiveMeshFiles") 
         { Resource = { Type = "LiveMeshFiles", HandlerType = "FileSystem" } };
 
     // Add the data feed to the new Mesh object
     newDirectory.DataFeeds.Add(ref feed);
 }
-```
 
 The method DirectoryExists() checks if a folder already exists within Mesh, the second method CreateDirectory() creates a new folder and adds a data feed to it.
 
 **Note**: The code contains some hardcoded strings such as LiveMeshFolder, LiveMeshFiles, FileSystem...etc. Feel free to improve on the design (make them constants for example), but these strings are needed if you want to retrieve / create the correct Mesh objects. Mesh allows you to store more than just folders and files.
 
-## Adding A File
+[Top of page](#top)
+
+**Adding A File**
 
 To enable your LiveMesh class to add files to a folder add the methods shown in Listing 9 to the class.
 
@@ -343,7 +361,6 @@ To enable your LiveMesh class to add files to a folder add the methods shown in 
 
 **Listing 9** - Adding A File
 
-```csharp
 public MeshObject FindDirectory(string directory)
 {
     return (from o in environment.Mesh.CreateQuery<MeshObject>().Execute()
@@ -380,19 +397,18 @@ public void AddFileToDirectory(string directory, string path)
     feed.SyncEntries.Synchronize();
     feed.Update();
 }
-```
 
 You can now add a file to a Live Mesh folder by calling the AddFileToFolder(directory, path) and the file will be uploaded to your Mesh. Check the Online Desktop to verify that it has been uploaded.
 
 **Listing 10** - Uploading About.txt
 
-```csharp
 // ...
 myMesh.AddFileToDirectory("My new folder", "About.txt");
-// ..
-```
+// ...
 
-## Retrieving A File
+[Top of page](#top)
+
+**Retrieving A File**
 
 We're almost there. The only thing that remains to be done is to retrieve a file from Mesh. The GetFileByFilename() method shown in Listing 11 allows you to do just that.
 
@@ -400,7 +416,6 @@ It queries all the Mesh objects and returns the first data entry whose resource 
 
 **Listing 11** - GetFileByFilename() method
 
-```csharp
 public DataEntry GetFileByFilename(string filename)
 {
     IEnumerable<MeshObject> meshObjects = GetMeshObjects();
@@ -422,13 +437,11 @@ public DataEntry GetFileByFilename(string filename)
     }
     return null;
 }
-```
 
 For example let's search for the text file About.txt which we added in the previous section.
 
 **Listing 12** - Retrieving a file
 
-```csharp
 // Retrieve a file
 DataEntry dataEntry = myMesh.GetFileByFilename("About.txt");
 if (dataEntry != null)
@@ -439,11 +452,12 @@ if (dataEntry != null)
     StreamReader reader = new StreamReader(stream);
     Console.WriteLine(reader.ReadToEnd());
 }
-```
 
 Once the DataEntry has been found you can call its ReadMediaResource() method to obtain a stream. The rest of the code reads the stream and writes the contents to the console.
 
-## Summary
+[Top of page](#top)
+
+**Summary**
 
 I hope you enjoyed this brief introduction to Live Mesh and the Live Framework. Let's recap what we've covered from a developer's point of view:
 
@@ -451,3 +465,13 @@ I hope you enjoyed this brief introduction to Live Mesh and the Live Framework. 
 - Listing resources (directories)
 - Add (uploading) files to Mesh
 - Retrieving (downloading) files from Mesh
+
+Any comments, questions, tips...etc. are always appreciated.
+
+[Top of page](#top)
+
+**Download**
+
+You can find the source code for this article on the [Download page](http://cgeers.wordpress.com/download/) of this blog.
+
+[Top of page](#top)
